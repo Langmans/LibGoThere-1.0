@@ -12,6 +12,7 @@ library hands that to the best provider present:
 | Provider | Needs | What the player gets |
 |---|---|---|
 | `spf` | [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever) | a route by foot, flight path, boat and hearthstone; travel times |
+| `movefast` | [Move Fast](https://www.curseforge.com/wow/addons/move-fast) | a route with steps and an arrow; travel times (kept a minute on the same map) |
 | `tomtom` | [TomTom](https://www.curseforge.com/wow/addons/tomtom) | a waypoint with TomTom's arrow, which many other addons follow too |
 | `waypoint` | the game (Forever, Retail) | the game's own map pin, tracked; AzerothGPS, Waypoint UI, Northstar and most arrows follow it |
 | `pinlink` | nothing | a map pin link in chat; clicking it sets the game's waypoint |
@@ -42,6 +43,9 @@ GoThere:Cancel("MyAddon")
 -- Seconds from where the player stands, and which provider worked it out; nil without one.
 local seconds, by = GoThere:TravelTime(1436, 0.42, 0.61)
 
+-- After something that changes travel times (a flight path learned): drop the ones kept.
+GoThere:ForgetTravelTimes()
+
 -- What the player has, for an options page or to say what to install:
 -- { id, addon, installed, loaded, usable, chosen } per provider, best first.
 for _, p in ipairs(GoThere:Providers()) do print(p.id, p.usable, p.chosen) end
@@ -56,8 +60,9 @@ owner, TomTom's `from`), and lets `Cancel` touch only your own target.
 ### Your own provider
 
 Another addon can add a provider: a table with an `id`, an `order` (lower is
-tried first; the built-in ones use 10, 30, 40 and 50), and `Usable` and
-`Navigate` methods; `Cancel` and `TravelTime` are optional. `Navigate` returns
+tried first; the built-in ones use 10, 20, 30, 40 and 50), and `Usable` and
+`Navigate` methods; `Cancel`, `TravelTime` and `Forget` (drop kept travel
+times) are optional. `Navigate` returns
 a handle (anything but nil or false) that `Cancel` gets back.
 
 ```lua
@@ -106,4 +111,6 @@ recording every call a provider receives.
 ## License
 
 MIT, see [LICENSE](https://github.com/Langmans/LibGoThere-1.0/blob/main/LICENSE).
-Shortest Path Forever (GPL-3) and TomTom are only called, never copied.
+Shortest Path Forever (GPL-3), Move Fast and TomTom are only called, never
+copied. Move Fast documents no API; the provider calls what Move Fast's own
+code does, each part checked first.

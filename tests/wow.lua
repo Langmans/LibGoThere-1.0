@@ -1,11 +1,12 @@
 -- A simulated WoW client for the library: the game's map and waypoint API, chat, and the route
--- addons the library hands a target to (Shortest Path Forever, TomTom), each only when a test asks
--- for it. Every value a test may vary is on the client object, and every call a provider
+-- addons the library hands a target to (Shortest Path Forever, MoveFast, TomTom), each only when a
+-- test asks for it. Every value a test may vary is on the client object, and every call a provider
 -- receives is recorded in client.calls. NewClient() resets the globals and loads the .toc's files
 -- (LibStub included) into a fresh state, so tests never share it.
 
 ---@class TestClientOptions
 ---@field spf boolean|table? Shortest Path Forever loaded; a table overrides API functions
+---@field moveFast boolean|table? MoveFast loaded and initialised; a table overrides parts
 ---@field tomTom boolean|table? TomTom loaded; a table overrides methods
 ---@field noWaypoint boolean? no C_Map.SetUserWaypoint (an old client)
 ---@field installed string[]? addons in the AddOns folder but not loaded
@@ -152,6 +153,47 @@ function NewClient(opts)
         }
         override(opts.spf, api)
         ShortestPathForever = { API = api }
+    end
+
+    -- MoveFast: the global with Router (nodes filled after login), Map, Tracker and Recorder, as
+    -- its own code has them. Coordinates in percent. client.routeTimes: seconds per "map:x:y"
+    -- target in percent, else no route. client.moveFastPlans counts the routes planned.
+    MoveFast = nil
+    client.routeTimes, client.moveFastPlans = {}, 0
+    if opts.moveFast then
+        present("MoveFast")
+        MoveFast = {
+            Router = {
+                nodes = {},
+                Route = function(_, start, dest, routeOpts)
+                    client.moveFastPlans = client.moveFastPlans + 1
+                    local p = dest.points[1]
+                    record("mf.Route", start, p.map, p.x, p.y, p.label, routeOpts and routeOpts.noTips)
+                    local total = client.routeTimes[p.map .. ":" .. p.x .. ":" .. p.y]
+                    if not total then return nil, "no way there" end
+                    return { total = total, dest = { name = p.label } }
+                end,
+            },
+            Map = {
+                Point = function(_, map, x, y)
+                    return { map = map, x = x, y = y }
+                end,
+            },
+            Tracker = {
+                Start = function(_, route)
+                    record("mf.Start", route.dest.name)
+                end,
+                Stop = function()
+                    record("mf.Stop")
+                end,
+            },
+            Recorder = {
+                ScanKnown = function()
+                    record("mf.ScanKnown")
+                end,
+            },
+        }
+        override(opts.moveFast, MoveFast)
     end
 
     -- TomTom: AddWaypoint gives a uid table, RemoveWaypoint takes it back.

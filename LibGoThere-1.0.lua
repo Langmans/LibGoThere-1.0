@@ -44,7 +44,7 @@ end
 ---Calls a provider's method in pcall: its first result, or, when it errors, nil, the error going to
 ---the error handler.
 ---@param provider LibGoThereProvider
----@param method "Usable"|"Navigate"|"Cancel"|"TravelTime"
+---@param method "Usable"|"Navigate"|"Cancel"|"TravelTime"|"Forget"
 ---@param ... string|LibGoThereResult
 ---@return LibGoThereResult
 local function Try(provider, method, ...)
@@ -122,6 +122,14 @@ function lib:TravelTime(map, x, y)
         end
     end
     return nil
+end
+
+---Drops the travel times providers keep, after something that changes them (a flight path
+---learned, say).
+function lib:ForgetTravelTimes()
+    for _, provider in ipairs(self.providers) do
+        if provider.Forget then Try(provider, "Forget") end
+    end
 end
 
 ---Which of several spots to go to: the one with the shortest travel time; without travel times,

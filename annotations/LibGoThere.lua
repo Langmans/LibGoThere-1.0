@@ -10,6 +10,7 @@
 ---@field NavigateNearest fun(self: LibGoThere, owner: string, points: LibGoTherePoint[]): string?, integer|string|nil
 ---@field Cancel fun(self: LibGoThere, owner: string): boolean
 ---@field TravelTime fun(self: LibGoThere, map: number, x: number, y: number): number?, string?
+---@field ForgetTravelTimes fun(self: LibGoThere)
 ---@field Providers fun(self: LibGoThere): LibGoThereProviderInfo[]
 ---@field PinLink fun(self: LibGoThere, map: number, x: number, y: number): string
 
@@ -41,6 +42,21 @@
 ---@field Navigate fun(self: LibGoThereProvider, owner: string, map: number, x: number, y: number, label: string?): LibGoThereResult
 ---@field Cancel (fun(self: LibGoThereProvider, owner: string, handle: LibGoThereResult): boolean)?
 ---@field TravelTime (fun(self: LibGoThereProvider, fromMap: number, fromX: number, fromY: number, map: number, x: number, y: number): number?)?
+---@field Forget (fun(self: LibGoThereProvider))? drops the travel times it keeps
+
+---MoveFast's parts the provider calls (its own Map.lua, Router.lua, Tracker.lua, Recorder.lua).
+---@class MoveFastAddon
+---@field Map {Point: fun(self: table, map: number, x: number, y: number): table}
+---@field Router {nodes: table, Route: fun(self: table, start: table?, dest: table, opts: table?): MoveFastRoute?, string?}
+---@field Tracker {Start: fun(self: table, route: MoveFastRoute), Stop: fun(self: table)}
+---@field Recorder {ScanKnown: fun(self: table)}?
+
+---@class MoveFastRoute
+---@field total number seconds
+
+---MoveFast's global; nil when it is not loaded.
+---@type MoveFastAddon?
+MoveFast = nil
 
 ---Shortest Path Forever's API (Core\API.lua there).
 ---@class SPFPublicAPI
