@@ -1,0 +1,9 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <!-- What an addon that embeds the library includes: the library, then each provider, best
+         first. LibStub must be loaded before (the addon's own copy, or this one's .toc). -->
+    <Script file="LibGoThere-1.0.lua"/>
+    <Script file="Providers\ShortestPathForever.lua"/>
+    <Script file="Providers\TomTom.lua"/>
+    <Script file="Providers\Waypoint.lua"/>
+    <Script file="Providers\PinLink.lua"/>
+</Ui>

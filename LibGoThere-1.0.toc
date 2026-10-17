@@ -1,0 +1,10 @@
+## Interface: 16001, 11509, 20506, 38002, 50504, 120007
+## Title: LibGoThere-1.0
+## Notes: Sends the player somewhere through the route or waypoint addon they have.
+## Author: Langmans
+## Version: @project-version@
+## OptionalDeps: ShortestPathForever, TomTom
+## X-License: MIT
+
+Libs\LibStub\LibStub.lua
+lib.xml
