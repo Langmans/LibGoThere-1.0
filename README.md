@@ -1,6 +1,7 @@
 # LibGoThere-1.0
 
 [![CI](https://github.com/Langmans/LibGoThere-1.0/actions/workflows/ci.yml/badge.svg)](https://github.com/Langmans/LibGoThere-1.0/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Langmans/LibGoThere-1.0?include_prereleases)](https://github.com/Langmans/LibGoThere-1.0/releases)
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
 ![WoW: Forever](https://img.shields.io/badge/WoW-Forever%20%2816001%29-c79c6e)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow)](https://github.com/Langmans/LibGoThere-1.0/blob/main/LICENSE)
