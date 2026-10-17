@@ -141,6 +141,8 @@ local function findLanguageServer()
 end
 
 local function lint()
+    -- The LS reads the libraries' types from Libs/, so fetch them first.
+    libs()
     print(bold("# StyLua"))
     report(sh.run({ tool("stylua"), "--check", "." }, true), "StyLua")
 
