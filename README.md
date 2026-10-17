@@ -12,7 +12,7 @@ library hands that to the best provider present:
 | Provider | Needs | What the player gets |
 |---|---|---|
 | `spf` | [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever) | a route by foot, flight path, boat and hearthstone; travel times |
-| `movefast` | [Move Fast](https://www.curseforge.com/wow/addons/move-fast) | a route with steps and an arrow; travel times (kept a minute on the same map) |
+| `movefast` | [Move Fast](https://www.curseforge.com/wow/addons/move-fast-travel-guide-item-finder) | a route with steps and an arrow; travel times (kept a minute on the same map) |
 | `tomtom` | [TomTom](https://www.curseforge.com/wow/addons/tomtom) | a waypoint with TomTom's arrow, which many other addons follow too |
 | `waypoint` | the game (Forever, Retail) | the game's own map pin, tracked; AzerothGPS, Waypoint UI, Northstar and most arrows follow it |
 | `pinlink` | nothing | a map pin link in chat; clicking it sets the game's waypoint |
