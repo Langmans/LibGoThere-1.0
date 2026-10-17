@@ -125,6 +125,41 @@ describe("LibGoThere-1.0", function()
             assert.are.same("far", client:called("spf.Navigate")[1][5])
         end)
 
+        it("gives the travel time to the point reached first, its index and the provider", function()
+            local client = NewClient({ spf = true })
+            client.estimates[WESTFALL .. ":0.4:0.6"] = 60
+            client.estimates["1429:0.6:0.5"] = 30
+            assert.are.same({ 30, 2, "spf" }, { client.lib:TravelTimeNearest(points) })
+            assert.is_nil(NewClient({ tomTom = true }).lib:TravelTimeNearest(points), "no provider has times")
+            assert.is_nil(client.lib:TravelTimeNearest({}))
+        end)
+
+        it("takes a provider's own Nearest, and goes on when it errors or has no answer", function()
+            local client = NewClient({ spf = true })
+            client.estimates["1429:0.6:0.5"] = 30
+            local answer = { 12, 3 }
+            client.lib:RegisterProvider({
+                id = "mine",
+                order = 5,
+                Usable = function()
+                    return true
+                end,
+                Navigate = function()
+                    return true
+                end,
+                Nearest = function()
+                    if answer == "error" then error("mine broke") end
+                    return answer[1], answer[2]
+                end,
+            })
+            assert.are.same({ 12, 3, "mine" }, { client.lib:TravelTimeNearest(points) })
+            answer = {}
+            assert.are.same({ 30, 2, "spf" }, { client.lib:TravelTimeNearest(points) }, "no answer")
+            answer = "error"
+            assert.are.same({ 30, 2, "spf" }, { client.lib:TravelTimeNearest(points) })
+            assert.are.equal(1, #client.errors)
+        end)
+
         it("without travel times, the nearest point on the player's map, else the first", function()
             local client = NewClient({ tomTom = true })
             assert.are.same({ "tomtom", 2 }, { client.lib:NavigateNearest("Kennel", points) })

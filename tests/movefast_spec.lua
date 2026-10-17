@@ -54,6 +54,18 @@ describe("the MoveFast provider", function()
         assert.are.equal(5, client.moveFastPlans, "no route is kept too")
     end)
 
+    it("weighs several spots in one plan, kept a minute like a single one", function()
+        local client = NewClient({ moveFast = true })
+        client.routeTimes[WESTFALL .. ":40:60"] = 120
+        client.routeTimes[WESTFALL .. ":70:20"] = 90
+        local points = { { WESTFALL, 0.4, 0.6 }, { WESTFALL, 0.7, 0.2 }, { WESTFALL, 0.9, 0.9 } }
+        assert.are.same({ 90, 2, "movefast" }, { client.lib:TravelTimeNearest(points) })
+        client.lib:TravelTimeNearest(points)
+        assert.are.equal(1, client.moveFastPlans, "one plan for all three, then kept")
+        assert.are.same({ "movefast", 2 }, { client.lib:NavigateNearest("Kennel", points) })
+        assert.is_nil(client.lib:TravelTimeNearest({ { WESTFALL, 0.9, 0.9 } }), "no route to any")
+    end)
+
     it("is only used when every part it calls is there", function()
         for _, missing in ipairs({ "Router", "Map", "Tracker" }) do
             local client = NewClient({ moveFast = { [missing] = false } })

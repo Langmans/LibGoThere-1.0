@@ -103,6 +103,18 @@ function lib:Cancel(owner)
     return own.provider.Cancel ~= nil and Try(own.provider, "Cancel", owner, own.handle) == true
 end
 
+---Where the player stands: the map and the spot on it, or nil when the client does not say.
+---@return number? map
+---@return number x
+---@return number y
+local function Here()
+    local map = C_Map.GetBestMapForUnit("player")
+    local position = map and C_Map.GetPlayerMapPosition(map, "player")
+    if not position then return nil, 0, 0 end
+    local x, y = position:GetXY()
+    return map, x, y
+end
+
 ---Seconds to travel from where the player stands to a spot, and the provider that worked it out;
 ---nil when no provider has travel times, no route is known, or the player's position is not.
 ---@param map number
@@ -111,10 +123,8 @@ end
 ---@return number? seconds
 ---@return string? providerID
 function lib:TravelTime(map, x, y)
-    local here = C_Map.GetBestMapForUnit("player")
-    local position = here and C_Map.GetPlayerMapPosition(here, "player")
-    if not position or not Valid(map, x, y) then return nil end
-    local fromX, fromY = position:GetXY()
+    local here, fromX, fromY = Here()
+    if not here or not Valid(map, x, y) then return nil end
     for _, provider in ipairs(self.providers) do
         if provider.TravelTime and Try(provider, "Usable") then
             local seconds = Try(provider, "TravelTime", here, fromX, fromY, map, x, y)
@@ -132,25 +142,66 @@ function lib:ForgetTravelTimes()
     end
 end
 
----Which of several spots to go to: the one with the shortest travel time; without travel times,
----the nearest on the player's own map; else the first.
+---One provider's answer to "which of these spots is reached first": its own Nearest when it can
+---weigh them all at once, else its TravelTime per spot. Seconds and the spot's index, or nil.
+---@param provider LibGoThereProvider
+---@param here number
+---@param fromX number
+---@param fromY number
+---@param points LibGoTherePoint[]
+---@return number? seconds
+---@return integer? index
+local function ProviderNearest(provider, here, fromX, fromY, points)
+    if provider.Nearest then
+        local ok, seconds, index = pcall(provider.Nearest, provider, here, fromX, fromY, points)
+        if not ok then
+            geterrorhandler()(seconds)
+            return nil
+        end
+        if type(seconds) == "number" and type(index) == "number" then return seconds, index end
+        return nil
+    end
+    ---@type number?, integer?
+    local best, bestIndex
+    for i, point in ipairs(points) do
+        local seconds = Try(provider, "TravelTime", here, fromX, fromY, point[1], point[2], point[3])
+        if type(seconds) == "number" and (not best or seconds < best) then
+            best, bestIndex = seconds, i
+        end
+    end
+    return best, bestIndex
+end
+
+---Seconds to the spot of several ({ uiMapID, x, y } each) that the player reaches first, its
+---index and the provider that worked it out; nil when no provider has travel times, there is no
+---route to any, or the player's position is not known.
+---@param points LibGoTherePoint[]
+---@return number? seconds
+---@return integer? index
+---@return string? providerID
+function lib:TravelTimeNearest(points)
+    local here, fromX, fromY = Here()
+    if type(points) ~= "table" or #points == 0 or not here then return nil end
+    for _, provider in ipairs(self.providers) do
+        if (provider.Nearest or provider.TravelTime) and Try(provider, "Usable") then
+            local seconds, index = ProviderNearest(provider, here, fromX, fromY, points)
+            if seconds then return seconds, index, provider.id end
+        end
+    end
+    return nil
+end
+
+---Which of several spots to go to: the one reached first; without travel times, the nearest on
+---the player's own map; else the first.
 ---@param points LibGoTherePoint[]
 ---@return integer
 local function Nearest(points)
-    local best, bestTime
-    for i, point in ipairs(points) do
-        local seconds = lib:TravelTime(point[1], point[2], point[3])
-        if seconds and (not bestTime or seconds < bestTime) then
-            best, bestTime = i, seconds
-        end
-    end
-    if best then return best end
-    local here = C_Map.GetBestMapForUnit("player")
-    local position = here and C_Map.GetPlayerMapPosition(here, "player")
-    if not position then return 1 end
-    local fromX, fromY = position:GetXY()
+    local _, index = lib:TravelTimeNearest(points)
+    if index then return index end
+    local here, fromX, fromY = Here()
+    if not here then return 1 end
     local bestDistance
-    best = 1
+    local best = 1
     for i, point in ipairs(points) do
         if point[1] == here then
             local distance = (point[2] - fromX) ^ 2 + (point[3] - fromY) ^ 2

@@ -165,13 +165,20 @@ function NewClient(opts)
         MoveFast = {
             Router = {
                 nodes = {},
+                -- Plans to the fastest-reached of dest.points, as Move Fast does.
                 Route = function(_, start, dest, routeOpts)
                     client.moveFastPlans = client.moveFastPlans + 1
                     local p = dest.points[1]
                     record("mf.Route", start, p.map, p.x, p.y, p.label, routeOpts and routeOpts.noTips)
-                    local total = client.routeTimes[p.map .. ":" .. p.x .. ":" .. p.y]
-                    if not total then return nil, "no way there" end
-                    return { total = total, dest = { name = p.label } }
+                    local best
+                    for _, point in ipairs(dest.points) do
+                        local total = client.routeTimes[point.map .. ":" .. point.x .. ":" .. point.y]
+                        if total and (not best or total < best.total) then
+                            best = { total = total, dest = { name = point.label } }
+                        end
+                    end
+                    if not best then return nil, "no way there" end
+                    return best
                 end,
             },
             Map = {

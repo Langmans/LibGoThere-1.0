@@ -13,7 +13,7 @@ library hands that to the best provider present:
 | Provider | Needs | What the player gets |
 |---|---|---|
 | `spf` | [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever) | a route by foot, flight path, boat and hearthstone; travel times |
-| `movefast` | [Move Fast](https://www.curseforge.com/wow/addons/move-fast-travel-guide-item-finder) | a route with steps and an arrow; travel times (kept a minute on the same map) |
+| `movefast` | [Move Fast](https://www.curseforge.com/wow/addons/move-fast-travel-guide-item-finder) | a route with steps and an arrow; travel times, the nearest of many spots in one plan (kept a minute on the same map) |
 | `tomtom` | [TomTom](https://www.curseforge.com/wow/addons/tomtom) | a waypoint with TomTom's arrow, which many other addons follow too |
 | `waypoint` | the game (Forever, Retail) | the game's own map pin, tracked; AzerothGPS, Waypoint UI, Northstar and most arrows follow it |
 | `pinlink` | nothing | a map pin link in chat; clicking it sets the game's waypoint |
@@ -44,6 +44,9 @@ GoThere:Cancel("MyAddon")
 -- Seconds from where the player stands, and which provider worked it out; nil without one.
 local seconds, by = GoThere:TravelTime(1436, 0.42, 0.61)
 
+-- Seconds to whichever of several spots the player reaches first, its index, and the provider.
+local seconds, index, by = GoThere:TravelTimeNearest({ { 1436, 0.42, 0.61 }, { 1429, 0.33, 0.70 } })
+
 -- After something that changes travel times (a flight path learned): drop the ones kept.
 GoThere:ForgetTravelTimes()
 
@@ -62,8 +65,10 @@ owner, TomTom's `from`), and lets `Cancel` touch only your own target.
 
 Another addon can add a provider: a table with an `id`, an `order` (lower is
 tried first; the built-in ones use 10, 20, 30, 40 and 50), and `Usable` and
-`Navigate` methods; `Cancel`, `TravelTime` and `Forget` (drop kept travel
-times) are optional. `Navigate` returns
+`Navigate` methods; `Cancel`, `TravelTime`, `Nearest` (weigh several spots at
+once: seconds and the index of the one reached first, for a router that plans
+to the nearest of many in one go, as Move Fast does) and `Forget` (drop kept
+travel times) are optional. `Navigate` returns
 a handle (anything but nil or false) that `Cancel` gets back.
 
 ```lua

@@ -11,6 +11,7 @@
 ---@field Cancel fun(self: LibGoThere, owner: string): boolean
 ---@field TravelTime fun(self: LibGoThere, map: number, x: number, y: number): number?, string?
 ---@field ForgetTravelTimes fun(self: LibGoThere)
+---@field TravelTimeNearest fun(self: LibGoThere, points: LibGoTherePoint[]): number?, integer?, string?
 ---@field Providers fun(self: LibGoThere): LibGoThereProviderInfo[]
 ---@field PinLink fun(self: LibGoThere, map: number, x: number, y: number): string
 
@@ -43,6 +44,7 @@
 ---@field Cancel (fun(self: LibGoThereProvider, owner: string, handle: LibGoThereResult): boolean)?
 ---@field TravelTime (fun(self: LibGoThereProvider, fromMap: number, fromX: number, fromY: number, map: number, x: number, y: number): number?)?
 ---@field Forget (fun(self: LibGoThereProvider))? drops the travel times it keeps
+---@field Nearest (fun(self: LibGoThereProvider, fromMap: number, fromX: number, fromY: number, points: LibGoTherePoint[]): number?, integer?)? weighs several spots at once: seconds and the index of the one reached first
 
 ---MoveFast's parts the provider calls (its own Map.lua, Router.lua, Tracker.lua, Recorder.lua).
 ---@class MoveFastAddon
@@ -53,6 +55,7 @@
 
 ---@class MoveFastRoute
 ---@field total number seconds
+---@field dest {name: string?}? the point it chose, by its label
 
 ---MoveFast's global; nil when it is not loaded.
 ---@type MoveFastAddon?
