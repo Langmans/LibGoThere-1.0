@@ -47,6 +47,10 @@ local seconds, by = GoThere:TravelTime(1436, 0.42, 0.61)
 -- Seconds to whichever of several spots the player reaches first, its index, and the provider.
 local seconds, index, by = GoThere:TravelTimeNearest({ { 1436, 0.42, 0.61 }, { 1429, 0.33, 0.70 } })
 
+-- Whether a provider with travel times is there to ask, without working one out (to offer a
+-- "hold Shift for the travel time" only when there would be one).
+local can = GoThere:HasTravelTimes()
+
 -- After something that changes travel times (a flight path learned): drop the ones kept.
 GoThere:ForgetTravelTimes()
 

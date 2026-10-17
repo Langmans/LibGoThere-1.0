@@ -12,6 +12,7 @@
 ---@field TravelTime fun(self: LibGoThere, map: number, x: number, y: number): number?, string?
 ---@field ForgetTravelTimes fun(self: LibGoThere)
 ---@field TravelTimeNearest fun(self: LibGoThere, points: LibGoTherePoint[]): number?, integer?, string?
+---@field HasTravelTimes fun(self: LibGoThere): boolean
 ---@field Providers fun(self: LibGoThere): LibGoThereProviderInfo[]
 ---@field PinLink fun(self: LibGoThere, map: number, x: number, y: number): string
 

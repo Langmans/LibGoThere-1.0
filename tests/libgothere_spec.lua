@@ -102,6 +102,12 @@ describe("LibGoThere-1.0", function()
             assert.is_nil(client.lib:TravelTime(BARRENS, 0.5, 0.5), "no route there")
         end)
 
+        it("says whether a provider that has travel times can be asked", function()
+            assert.is_true(NewClient({ spf = true }).lib:HasTravelTimes())
+            assert.is_false(NewClient({ tomTom = true }).lib:HasTravelTimes(), "TomTom has none")
+            assert.is_false(NewClient({ spf = { version = 0 } }).lib:HasTravelTimes(), "an SPF it cannot use")
+        end)
+
         it("has none without SPF, or without the player's position", function()
             assert.is_nil(NewClient({ tomTom = true }).lib:TravelTime(WESTFALL, 0.4, 0.6))
             local client = NewClient({ spf = true })

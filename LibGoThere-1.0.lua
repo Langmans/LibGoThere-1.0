@@ -134,6 +134,17 @@ function lib:TravelTime(map, x, y)
     return nil
 end
 
+---Whether a provider that has travel times can be asked now: whether TravelTime and
+---TravelTimeNearest may give one, without working any out. For a tooltip that says "hold Shift
+---for the travel time" only when there would be one.
+---@return boolean
+function lib:HasTravelTimes()
+    for _, provider in ipairs(self.providers) do
+        if (provider.TravelTime or provider.Nearest) and Try(provider, "Usable") then return true end
+    end
+    return false
+end
+
 ---Drops the travel times providers keep, after something that changes them (a flight path
 ---learned, say).
 function lib:ForgetTravelTimes()
