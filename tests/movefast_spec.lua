@@ -66,6 +66,16 @@ describe("the MoveFast provider", function()
         assert.is_nil(client.lib:TravelTimeNearest({ { WESTFALL, 0.9, 0.9 } }), "no route to any")
     end)
 
+    it("leaves out a spot on a map MoveFast cannot place", function()
+        local client = NewClient({ moveFast = true, tomTom = true })
+        client.routeTimes[WESTFALL .. ":70:20"] = 90
+        local points = { { 9999, 0.5, 0.5 }, { WESTFALL, 0.7, 0.2 } }
+        assert.are.same({ 90, 2, "movefast" }, { client.lib:TravelTimeNearest(points) })
+        assert.is_nil(client.lib:TravelTimeNearest({ { 9999, 0.5, 0.5 } }), "none it can place")
+        assert.are.equal("tomtom", client.lib:Navigate("Kennel", 9999, 0.5, 0.5), "the next provider")
+        assert.are.same({}, client.errors)
+    end)
+
     it("is only used when every part it calls is there", function()
         for _, missing in ipairs({ "Router", "Map", "Tracker" }) do
             local client = NewClient({ moveFast = { [missing] = false } })

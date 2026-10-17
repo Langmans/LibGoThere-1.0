@@ -182,7 +182,9 @@ function NewClient(opts)
                 end,
             },
             Map = {
+                -- A map MoveFast has no data for (9999) gives no point, as its own does.
                 Point = function(_, map, x, y)
+                    if map == 9999 then return nil end
                     return { map = map, x = x, y = y }
                 end,
             },

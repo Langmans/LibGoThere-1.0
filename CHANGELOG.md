@@ -9,3 +9,5 @@
 - TravelTimeNearest: the spot of several reached first; a provider may weigh
   them all at once (Move Fast does, in one plan).
 - HasTravelTimes: whether a provider with travel times can be asked.
+- Move Fast leaves out a spot on a map it has no data for, instead of failing
+  the whole plan.

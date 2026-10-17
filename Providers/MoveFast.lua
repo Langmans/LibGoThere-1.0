@@ -28,7 +28,8 @@ end
 
 ---A route to the fastest-reached of several spots ({ uiMapID, x, y } each, 0 to 1), each spot
 ---labelled with `label` when there is one, else with its index, so the route's dest.name says
----which it chose. Nil without one.
+---which it chose. A spot on a map MoveFast has no data for (Map:Point gives nothing) is left out.
+---Nil without a route, or without a spot MoveFast can place.
 ---@param spots LibGoTherePoint[]
 ---@param label string?
 ---@param opts table?
@@ -38,11 +39,14 @@ local function Plan(spots, label, opts)
     ---@type table[]
     local points = {}
     for i, spot in ipairs(spots) do
-        ---@type table
+        ---@type table?
         local point = mf.Map:Point(spot[1], spot[2] * 100, spot[3] * 100)
-        point.label = label or tostring(i)
-        points[i] = point
+        if point then
+            point.label = label or tostring(i)
+            points[#points + 1] = point
+        end
     end
+    if #points == 0 then return nil end
     local dest = { kind = "point", name = points[1].label, points = points, radius = 15 }
     ---@type MoveFastRoute?
     local route = mf.Router:Route(nil, dest, opts)
