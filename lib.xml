@@ -4,6 +4,8 @@
     <Script file="LibGoThere-1.0.lua"/>
     <Script file="Providers\ShortestPathForever.lua"/>
     <Script file="Providers\MoveFast.lua"/>
+    <Script file="Providers\WaypointUI.lua"/>
+    <Script file="Providers\Carbonite.lua"/>
     <Script file="Providers\TomTom.lua"/>
     <Script file="Providers\Waypoint.lua"/>
     <Script file="Providers\PinLink.lua"/>

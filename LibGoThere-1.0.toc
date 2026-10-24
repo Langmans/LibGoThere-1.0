@@ -3,7 +3,7 @@
 ## Notes: Sends the player somewhere through the route or waypoint addon they have.
 ## Author: Langmans
 ## Version: @project-version@
-## OptionalDeps: ShortestPathForever, MoveFast, TomTom
+## OptionalDeps: ShortestPathForever, MoveFast, WaypointUI, Carbonite, TomTom
 ## X-License: MIT
 
 Libs\LibStub\LibStub.lua

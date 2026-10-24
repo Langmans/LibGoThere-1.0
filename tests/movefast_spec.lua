@@ -11,7 +11,7 @@ describe("the MoveFast provider", function()
         for i, provider in ipairs(client.lib:Providers()) do
             ids[i] = provider.id
         end
-        assert.are.same({ "spf", "movefast", "tomtom", "waypoint", "pinlink" }, ids)
+        assert.are.same({ "spf", "movefast", "waypointui", "carbonite", "tomtom", "waypoint", "pinlink" }, ids)
         assert.are.equal("spf", client.lib:Navigate("Kennel", WESTFALL, 0.4, 0.6))
     end)
 

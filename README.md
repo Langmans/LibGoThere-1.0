@@ -14,9 +14,11 @@ library hands that to the best provider present:
 |---|---|---|
 | `spf` | [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever) | a route by foot, flight path, boat and hearthstone; travel times |
 | `movefast` | [Move Fast](https://www.curseforge.com/wow/addons/move-fast-travel-guide-item-finder) | a route with steps and an arrow; travel times, the nearest of many spots in one plan (kept a minute on the same map) |
+| `waypointui` | [Waypoint UI](https://www.curseforge.com/wow/addons/waypoint-ui) (Forever, Retail) | a waypoint shown in the world, routed by Waypoint UI itself when FarstriderLib or Mapzeroth is there |
+| `carbonite` | [Carbonite All in One](https://www.curseforge.com/wow/addons/carbonite-classic) (every client) | a target on Carbonite's map with its arrow |
 | `tomtom` | [TomTom](https://www.curseforge.com/wow/addons/tomtom) | a waypoint with TomTom's arrow, which many other addons follow too |
 | `waypoint` | the game (Forever, Retail) | the game's own map pin, tracked; AzerothGPS, Waypoint UI, Northstar and most arrows follow it |
-| `pinlink` | nothing | a map pin link in chat; clicking it sets the game's waypoint |
+| `pinlink` | nothing | a map pin link in chat; clicking it sets the game's waypoint. Classic Era has neither the link nor the waypoint: there the zone and coordinates as text |
 
 Every call into another addon goes through `pcall`, so a provider that changes
 or breaks only falls back to the next; its error goes to the error handler.
@@ -121,6 +123,6 @@ recording every call a provider receives.
 ## License
 
 MIT, see [LICENSE](https://github.com/Langmans/LibGoThere-1.0/blob/main/LICENSE).
-Shortest Path Forever (GPL-3), Move Fast and TomTom are only called, never
-copied. Move Fast documents no API; the provider calls what Move Fast's own
+Shortest Path Forever (GPL-3), Move Fast, Waypoint UI, Carbonite (GPL-3) and
+TomTom are only called, never copied. Move Fast documents no API; the provider calls what Move Fast's own
 code does, each part checked first.

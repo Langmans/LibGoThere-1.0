@@ -11,3 +11,7 @@
 - HasTravelTimes: whether a provider with travel times can be asked.
 - Move Fast leaves out a spot on a map it has no data for, instead of failing
   the whole plan.
+- Providers for Waypoint UI (Forever, retail) and Carbonite (every client),
+  both before TomTom.
+- Where the client can open no map pin link (Classic Era), the last resort
+  writes the zone and coordinates as text.

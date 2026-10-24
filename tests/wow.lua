@@ -8,6 +8,8 @@
 ---@field spf boolean|table? Shortest Path Forever loaded; a table overrides API functions
 ---@field moveFast boolean|table? MoveFast loaded and initialised; a table overrides parts
 ---@field tomTom boolean|table? TomTom loaded; a table overrides methods
+---@field waypointUI boolean|table? Waypoint UI loaded; a table overrides its Navigation API
+---@field carbonite boolean|table? Carbonite loaded; a table overrides Nx's methods
 ---@field noWaypoint boolean? no C_Map.SetUserWaypoint (an old client)
 ---@field installed string[]? addons in the AddOns folder but not loaded
 
@@ -219,6 +221,50 @@ function NewClient(opts)
             end,
         }
         override(opts.tomTom, TomTom)
+    end
+
+    -- Waypoint UI: NewUserNavigation gives the navigation it tracks, ClearUserNavigation takes the
+    -- tracked one away.
+    WaypointUIAPI = nil
+    if opts.waypointUI then
+        present("WaypointUI")
+        local tracked
+        WaypointUIAPI = {
+            Navigation = {
+                NewUserNavigation = function(options)
+                    record("wui.NewUserNavigation", options.mapID, options.x, options.y, options.name)
+                    tracked = { mapID = options.mapID, x = options.x, y = options.y, name = options.name }
+                    return tracked
+                end,
+                GetUserNavigation = function()
+                    return tracked
+                end,
+                ClearUserNavigation = function()
+                    record("wui.ClearUserNavigation", tracked and tracked.name)
+                    tracked = nil
+                end,
+            },
+        }
+        client.waypointUI = WaypointUIAPI.Navigation
+        override(opts.waypointUI, WaypointUIAPI.Navigation)
+    end
+
+    -- Carbonite: Nx:TTAddWaypoint gives the target's id, Nx:TTRemoveWaypoint takes it back.
+    Nx = nil
+    if opts.carbonite then
+        present("Carbonite")
+        local nextID = 0
+        Nx = {
+            TTAddWaypoint = function(_, map, x, y, wpOpts)
+                record("nx.TTAddWaypoint", map, x, y, wpOpts.title)
+                nextID = nextID + 1
+                return nextID
+            end,
+            TTRemoveWaypoint = function(_, id)
+                record("nx.TTRemoveWaypoint", id)
+            end,
+        }
+        override(opts.carbonite, Nx)
     end
 
     -- Errors the library reports instead of raising (a provider that fails).

@@ -196,6 +196,22 @@ describe("LibGoThere-1.0", function()
                 chosen = false,
             },
             { id = "movefast", addon = "MoveFast", installed = false, loaded = false, usable = false, chosen = false },
+            {
+                id = "waypointui",
+                addon = "WaypointUI",
+                installed = false,
+                loaded = false,
+                usable = false,
+                chosen = false,
+            },
+            {
+                id = "carbonite",
+                addon = "Carbonite",
+                installed = false,
+                loaded = false,
+                usable = false,
+                chosen = false,
+            },
             { id = "tomtom", addon = "TomTom", installed = true, loaded = true, usable = true, chosen = true },
             { id = "waypoint", installed = true, loaded = true, usable = true, chosen = false },
             { id = "pinlink", installed = true, loaded = true, usable = true, chosen = false },
@@ -216,7 +232,7 @@ describe("LibGoThere-1.0", function()
         local again = client:loadAgain()
         assert.are.equal(client.lib, again)
         assert.is_true(again:Cancel("Kennel"), "what the first copy knew stays")
-        assert.are.equal(5, #again:Providers(), "providers are not registered twice")
+        assert.are.equal(7, #again:Providers(), "providers are not registered twice")
     end)
 
     it("takes a provider another addon registers, in its place by order", function()
@@ -231,7 +247,7 @@ describe("LibGoThere-1.0", function()
                 return true
             end,
         })
-        assert.are.same({ "spf", "movefast", "mine", "tomtom" }, {
+        assert.are.same({ "spf", "movefast", "waypointui", "mine" }, {
             client.lib:Providers()[1].id,
             client.lib:Providers()[2].id,
             client.lib:Providers()[3].id,

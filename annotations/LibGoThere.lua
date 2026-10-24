@@ -84,3 +84,27 @@ ShortestPathForever = nil
 ---TomTom's addon object; nil when it is not loaded.
 ---@type TomTomAddon?
 TomTom = nil
+
+---A navigation Waypoint UI tracks.
+---@class WaypointUINavigation
+---@field mapID number
+---@field x number
+---@field y number
+---@field name string?
+
+---@class WaypointUINavigationAPI
+---@field NewUserNavigation fun(options: {name: string?, mapID: number, x: number, y: number}): WaypointUINavigation?
+---@field GetUserNavigation fun(): WaypointUINavigation?
+---@field ClearUserNavigation fun(preserveWaypoint: boolean?, suppressAdvance: boolean?)
+
+---Waypoint UI's public API; nil when it is not loaded.
+---@type {Navigation: WaypointUINavigationAPI}?
+WaypointUIAPI = nil
+
+---@class CarboniteNx
+---@field TTAddWaypoint fun(self: CarboniteNx, map: number, x: number, y: number, opts: {title: string?}): number
+---@field TTRemoveWaypoint fun(self: CarboniteNx, id: number)
+
+---Carbonite's addon object; nil when it is not loaded.
+---@type CarboniteNx?
+Nx = nil
