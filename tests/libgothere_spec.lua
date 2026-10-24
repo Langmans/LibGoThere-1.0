@@ -48,7 +48,16 @@ describe("LibGoThere-1.0", function()
             assert.are.equal("pinlink", client.lib:Navigate("Kennel", UNKNOWN_MAP, 0.4, 0.6, "Somewhere"))
             assert.is_true(client:printedContains("|Hworldmap:9999:4000:6000|h[Map Pin Location]|h"))
             assert.is_true(client:printedContains("Somewhere"))
-            assert.are.equal("pinlink", NewClient({ noWaypoint = true }).lib:Navigate("Kennel", WESTFALL, 0.4, 0.6))
+        end)
+
+        it("writes the zone and coordinates as text where the client has no map pin links", function()
+            -- Classic Era: no waypoint API, and a worldmap link errors on a click.
+            local client = NewClient({ noWaypoint = true })
+            assert.are.equal("pinlink", client.lib:Navigate("Kennel", WESTFALL, 0.4, 0.605, "Somewhere"))
+            assert.is_true(client:printedContains("Kennel: Somewhere, Westfall 40.0, 60.5"))
+            assert.is_false(client:printedContains("|Hworldmap"))
+            client.lib:Navigate("Kennel", UNKNOWN_MAP, 0.4, 0.6)
+            assert.is_true(client:printedContains("Kennel: 40.0, 60.0"), "a map without a name")
         end)
 
         it("refuses a target off the map or without an owner", function()
