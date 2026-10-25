@@ -13,6 +13,9 @@
 package.path = "./?.lua;" .. package.path
 local sh = require("tests.sh")
 
+-- The file that declares the library's MINOR.
+local LIBRARY_FILE = "LibGoThere-1.0.lua"
+
 local useColor = not os.getenv("NO_COLOR")
 local function paint(code)
     return function(text)
@@ -50,15 +53,40 @@ end
 ---@return number
 local function coverageReport()
     local text = sh.read("coverage/lcov.info")
+    -- A file can come twice: once as the tests ran it (Providers/TomTom.lua), once from
+    -- includeuntestedfiles under its Windows path (Providers\TomTom.lua, all zeros). Merged by
+    -- name, a line counts as hit when either record hit it.
+    ---@type string[], table<string, table<number, number>>
+    local files, counts = {}, {}
+    for record in text:gmatch("SF:.-end_of_record") do
+        local file = record:match("^SF:([^\r\n]+)"):gsub("\\", "/")
+        if not counts[file] then
+            files[#files + 1] = file
+            counts[file] = {}
+        end
+        local lines = counts[file]
+        for line, count in record:gmatch("DA:(%d+),(%d+)") do
+            local n = tonumber(line) --[[@as number]]
+            lines[n] = math.max(lines[n] or 0, tonumber(count) --[[@as number]])
+        end
+    end
     local hit, total = 0, 0
     local rows = {}
     print(bold("\nCoverage (lines hit / executable):"))
-    for record in text:gmatch("SF:.-end_of_record") do
-        local file = record:match("^SF:([^\r\n]+)"):gsub("\\", "/")
-        local lh, lf = tonumber(record:match("LH:(%d+)")), tonumber(record:match("LF:(%d+)"))
+    for _, file in ipairs(files) do
+        local numbers = {}
+        for n in pairs(counts[file]) do
+            numbers[#numbers + 1] = n
+        end
+        table.sort(numbers)
+        local lh, lf = 0, #numbers
         local missed = {}
-        for line, count in record:gmatch("DA:(%d+),(%d+)") do
-            if count == "0" then missed[#missed + 1] = line end
+        for _, n in ipairs(numbers) do
+            if counts[file][n] > 0 then
+                lh = lh + 1
+            else
+                missed[#missed + 1] = tostring(n)
+            end
         end
         local pct = lf > 0 and 100 * lh / lf or 100
         local color = pct >= 100 and green or pct >= 90 and yellow or red
@@ -165,9 +193,19 @@ local function lint()
     report(coverage == 100, ("type coverage %s%%, must be 100%%"):format(tostring(coverage)))
 end
 
+---On a CI run for a tag (the Release workflow runs these checks first): the tag must be the
+---library's MINOR. Any other run has no tag to check.
+local function releaseTag()
+    if os.getenv("GITHUB_REF_TYPE") ~= "tag" then return end
+    local version = require("tests.version")
+    local ok, message = version.checkTag(os.getenv("GITHUB_REF_NAME") or "", version.minor(LIBRARY_FILE))
+    report(ok, message)
+end
+
 local command = arg[1] or "all"
 local extra = { select(2, unpack(arg)) }
 if command == "all" then
+    releaseTag()
     lint()
     test({})
 elseif command == "test" then

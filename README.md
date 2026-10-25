@@ -110,7 +110,9 @@ that breaks it becomes `LibGoThere-2.0`, a library of its own. Within it, the
 minor version (`MINOR` in `LibGoThere-1.0.lua`) is a whole number that goes up
 by one with every release, and the release tag is that same number (`1`, `2`,
 ...). When several addons embed the library, LibStub keeps the copy with the
-highest minor.
+highest minor. CI fails on a release tag that is not MINOR: raise MINOR,
+commit, then tag. Between releases MINOR stays, and every addon embedding the
+library pins the same commit.
 
 ## Development
 

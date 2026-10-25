@@ -12,7 +12,8 @@ local function expandXml(file)
     local dir = file:match("^(.*)/") or "."
     local files = {}
     for tag, path in text:gmatch('<(%a+)%s+file="([^"]+)"') do
-        local target = dir .. "/" .. path:gsub("\\", "/")
+        -- A file next to the .toc keeps a bare path, as the coverage report names it.
+        local target = (dir == "." and "" or dir .. "/") .. path:gsub("\\", "/")
         if tag == "Include" then
             for _, f in ipairs(expandXml(target)) do
                 files[#files + 1] = f
