@@ -116,7 +116,7 @@ library pins the same commit.
 
 ## Development
 
-The same setup as [Kennel](https://github.com/Langmans/Kennel): busted and
+The same setup as [Beastkeeper](https://github.com/Langmans/Beastkeeper): busted and
 luacov on Lua 5.1, StyLua, WoW Lua LS, all through `tests/check.lua`
 (`tests\setup-lua.ps1` builds the tools on Windows). Line and type coverage are
 held at 100%. `tests/wow.lua` simulates the client and each provider addon,
